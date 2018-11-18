@@ -31,7 +31,7 @@ public class Administrator {
             + "model_year integer,"
             + "model varchar(30),"
             + "passengers integer,"
-            + "taken boolean,"
+            + "taken integer NOT NULL DEFAULT 0,"
             + "FOREIGN KEY (passenger_id) REFERENCES passenger(id));";
 
         String tripSQL = "CREATE TABLE IF NOT EXISTS trip("

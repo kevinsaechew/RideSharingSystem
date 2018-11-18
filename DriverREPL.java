@@ -35,22 +35,59 @@ public class DriverREPL {
                         System.out.println("Invalid ID.");
                         break;
                     }
-                    System.out.println(driver.checkValidRequests(driverId));
+
+                    // Checks to see if a driver is in any unfinished trips. If not, returns valid requests
+                    String checkValidRequestsString = driver.checkValidRequests(driverId);
+                    if (checkValidRequestsString.equals("unfinished")) {
+                        System.out.println("Please finish your trip first.");
+                        break;
+                    }
+
+                    System.out.println(checkValidRequestsString);
 
                     System.out.println("Please enter the request ID.");
                     int requestId = Integer.parseInt(scanner.nextLine());
-                    driver.takeRequest(driverId, requestId);
+
+                    System.out.println(driver.takeRequest(driverId, requestId));
 
                     break;
                 case "2":
                     System.out.println("Please enter your ID.");
+                    try {
+                       driverId = Integer.parseInt(scanner.nextLine());
+                    } catch(NumberFormatException e) {
+                        System.out.println("Invalid ID.");
+                        break;
+                    }
 
+                    String unfinishedTrip = driver.getUnfinishedTrip(driverId);
+
+                    if (unfinishedTrip.equalsIgnoreCase("not in trip")) {
+                        System.out.println("You are not on any trips");
+                        break;
+                    }
+                    System.out.println(unfinishedTrip);
+                    System.out.println("Do you wish to finish the trip? [y/n]");
+                    String yesOrNo = scanner.nextLine();
+
+                    if (yesOrNo.equalsIgnoreCase("y")) {
+                        System.out.println(driver.finishTrip(driverId));
+                    } else {
+                        System.out.println("Okay.");
+                        break;
+                    }
                     break;
                 case "3":
                     System.out.println("Please enter your ID.");
+                    try {
+                        driverId = Integer.parseInt(scanner.nextLine());
+                     } catch(NumberFormatException e) {
+                         System.out.println("Invalid ID.");
+                         break;
+                     }
 
+                    System.out.println(driver.checkDriverRating(driverId));
                     break;
-
                 case "4":
                     break loop;
             }

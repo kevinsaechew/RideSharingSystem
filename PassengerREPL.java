@@ -106,7 +106,11 @@ public class PassengerREPL {
                     }
 
                     if (rating != -1) {
-                    System.out.println(passenger.rateTrip(passengerId, tripID, rating));
+                        if (passenger.isTripIsValid(passengerId, tripID, rating)) {
+                            System.out.println(passenger.rateTrip(passengerId, tripID, rating));
+                        } else {
+                            System.out.println("Not a valid trip to rate.");
+                        }
                     }
                     break;
 

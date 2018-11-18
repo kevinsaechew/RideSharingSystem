@@ -63,12 +63,12 @@ public class Passenger {
         return numberOfRides;
     }
 
-    // Done
     public String checkTripRecords(int passengerId, Timestamp startTimestamp, Timestamp endTimestamp) {
         String str = "Trip ID, Driver Name, Vehicle ID, Vehicle model, Start, End, Fee, Rating \n";
 
         String sqlRequest = "SELECT trip.id, driver.name, vehicle.id, vehicle.model, trip.start, trip.end, trip.fee, trip.rating" +
-        " FROM trip, driver, vehicle WHERE trip.passenger_id = ? AND trip.start >= ? AND trip.end <= ? AND trip.driver_id = driver.id AND driver.vehicle_id = vehicle.id;";
+        " FROM trip, driver, vehicle WHERE trip.passenger_id = ? AND trip.start >= ? AND trip.end <= ? AND trip.driver_id = driver.id" +
+        " AND trip.end IS NOT NULL AND driver.vehicle_id = vehicle.id ORDER BY trip.start DESC;";
         try (PreparedStatement prep = conn.prepareStatement(sqlRequest)) {
             prep.setInt(1, passengerId);
             prep.setTimestamp(2, startTimestamp);
@@ -87,7 +87,31 @@ public class Passenger {
         return str;
 
     }
-    public String rateTrip(int passengerId, int tripId, int rating ) {
+
+    // Returns true if trip is valid
+    public boolean isTripIsValid(int passengerId, int tripId, int rating ) {
+        String sqlRequest = "SELECT trip.end FROM trip WHERE trip.end IS NOT NULL AND trip.id = ? AND trip.passenger_id = ?";
+
+        try (PreparedStatement prep = conn.prepareStatement(sqlRequest)) {
+            prep.setInt(1, passengerId);
+            prep.setInt(2, tripId);
+            try (ResultSet rs = prep.executeQuery()) {
+                if (rs.next()) {
+                    Timestamp value = rs.getTimestamp("trip.end");
+                    if (rs.wasNull()) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+
+    }
+    public String rateTrip(int passengerId, int tripId, int rating) {
         String str = "Trip ID, Driver Name, Vehicle ID, Vehicle model, Start, End, Fee, Rating \n";
         String sqlUpdate = String.format("UPDATE trip SET rating = %d WHERE trip.id = %d AND trip.passenger_id = %d", rating, tripId, passengerId);
 
